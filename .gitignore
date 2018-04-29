@@ -1,0 +1,11 @@
+/bin
+/.gradle
+/.settings
+/build
+/eclipse
+.classpath
+.project
+/run
+*.launch
+/.idea
+/doc
