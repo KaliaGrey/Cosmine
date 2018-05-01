@@ -8,17 +8,24 @@ import java.util.HashMap;
 
 public class InvestitureRegistry {
     public static HashMap<String, InvestitureSystem> SYSTEMS;
+    public static HashMap<String, Investiture> INVESTITURES;
+
+    public static AllomancySystem ALLOMANCY;
 
     public static void register() {
         SYSTEMS = new HashMap<String, InvestitureSystem>();
-        registerSystem(new AllomancySystem());
+        INVESTITURES = new HashMap<String, Investiture>();
+
+        ALLOMANCY = (AllomancySystem)registerSystem(new AllomancySystem());
     }
 
-    public static Investiture getInvestiture(String system, String investiture) {
-        return SYSTEMS.get(system).getInvestiture(investiture);
-    }
-
-    private static void registerSystem(AllomancySystem system) {
+    public static InvestitureSystem registerSystem(InvestitureSystem system) {
         SYSTEMS.put(system.name, system);
+        return system;
+    }
+
+    public static Investiture registerInvestiture(Investiture investiture) {
+        INVESTITURES.put(investiture.name, investiture);
+        return investiture;
     }
 }

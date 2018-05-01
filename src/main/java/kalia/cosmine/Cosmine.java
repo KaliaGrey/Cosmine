@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Cosmine.MOD_ID, name = Cosmine.MOD_NAME, version = Cosmine.MOD_VERSION, /*dependencies = "required-after:Forge@[14.23.3.2655,)",*/ useMetadata = true)
 public class Cosmine {
@@ -20,8 +21,11 @@ public class Cosmine {
     @Mod.Instance
     public static Cosmine instance;
 
+    public static Logger logger;
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        logger = event.getModLog();
         proxy.preInit(event);
     }
 

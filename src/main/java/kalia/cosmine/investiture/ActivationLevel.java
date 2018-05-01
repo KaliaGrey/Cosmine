@@ -10,6 +10,14 @@ public enum ActivationLevel {
 
     public static HashMap<ActivationLevel, Integer> index;
 
+    public static int toIndex(ActivationLevel activationLevel) {
+        return ActivationLevel.index.get(activationLevel);
+    }
+
+    public static ActivationLevel fromIndex(int index) {
+        return ActivationLevel.values()[index];
+    }
+
     static {
         index = new HashMap<ActivationLevel, Integer>();
 

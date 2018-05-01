@@ -1,5 +1,9 @@
 package kalia.cosmine.investiture;
 
+import kalia.cosmine.capability.ISpiritweb;
+import kalia.cosmine.registry.InvestitureRegistry;
+import net.minecraft.nbt.NBTTagCompound;
+
 import java.util.HashMap;
 
 public abstract class InvestitureSystem {
@@ -17,6 +21,9 @@ public abstract class InvestitureSystem {
 
     protected Investiture registerInvestiture(Investiture investiture) {
         this.investitures.put(investiture.name, investiture);
+        InvestitureRegistry.registerInvestiture(investiture);
         return investiture;
     }
+
+    public abstract SpiritwebInvestiture createSpiritwebInvestiture(ISpiritweb spiritweb, NBTTagCompound nbt);
 }

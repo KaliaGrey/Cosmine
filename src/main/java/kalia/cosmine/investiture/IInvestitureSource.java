@@ -2,5 +2,6 @@ package kalia.cosmine.investiture;
 
 public interface IInvestitureSource {
     Investiture getInvestiture();
-    float getInvestitureIntensity();
+    void setIntensity(float intensity);
+    float getIntensity();
 }

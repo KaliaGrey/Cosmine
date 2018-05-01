@@ -4,7 +4,6 @@ import kalia.cosmine.capability.PlayerSpiritweb;
 import kalia.cosmine.investiture.ActivationLevel;
 import kalia.cosmine.investiture.Investiture;
 import kalia.cosmine.investiture.allomancy.AllomancySystem;
-import kalia.cosmine.network.InvestitureActivationChangedPacket;
 import kalia.cosmine.network.NetworkHandler;
 import kalia.cosmine.registry.KeyBindingRegistry;
 import net.minecraft.client.Minecraft;
@@ -23,9 +22,9 @@ public class InputHandler {
 
             boolean activate = spiritweb.getSpiritwebInvestiture(tinAllomancy).activationLevel == ActivationLevel.NONE;
 
-            NetworkHandler.INSTANCE.sendToServer(
-                new InvestitureActivationChangedPacket(tinAllomancy.system.name, tinAllomancy.name, activate ? ActivationLevel.MEDIUM : ActivationLevel.NONE)
-            );
+            /*NetworkHandler.INSTANCE.sendToServer(
+                new InvestitureActivationPacket(tinAllomancy.system.name, tinAllomancy.name, activate ? ActivationLevel.MEDIUM : ActivationLevel.NONE)
+            );*/
         }
     }
 }

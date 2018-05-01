@@ -10,7 +10,7 @@ public final class Investiture {
 
     public Investiture(InvestitureSystem system, String name, float savantThreshold, IInvestitureEffects effects) {
         this.system = system;
-        this.name = name;
+        this.name = system.name + ":" + name;
         this.savantThreshold = savantThreshold;
         this.effects = effects;
     }
