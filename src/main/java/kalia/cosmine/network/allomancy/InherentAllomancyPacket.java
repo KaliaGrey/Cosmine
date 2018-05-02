@@ -12,32 +12,32 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class InherentAllomancyPacket implements IMessage {
-    public String identity;
+    public int entityID;
     public String investiture;
     public NBTTagCompound nbt;
 
     @Override
     public void fromBytes(ByteBuf buffer) {
-        this.identity = ByteBufUtils.readUTF8String(buffer);
+        this.entityID = buffer.readInt();
         this.investiture = ByteBufUtils.readUTF8String(buffer);
         this.nbt = ByteBufUtils.readTag(buffer);
     }
 
     @Override
     public  void toBytes(ByteBuf buffer) {
-        ByteBufUtils.writeUTF8String(buffer, this.identity);
+        buffer.writeInt(this.entityID);
         ByteBufUtils.writeUTF8String(buffer, this.investiture);
         ByteBufUtils.writeTag(buffer, nbt);
     }
 
     public InherentAllomancyPacket() {
-        this.identity = null;
+        this.entityID = -1;
         this.investiture = null;
         this.nbt = null;
     }
 
-    public InherentAllomancyPacket(String identity, InherentAllomancySource inherentAllomancySource) {
-        this.identity = identity;
+    public InherentAllomancyPacket(int entityID, InherentAllomancySource inherentAllomancySource) {
+        this.entityID = entityID;
         this.investiture = inherentAllomancySource.getInvestiture().name;
         this.nbt = inherentAllomancySource.serializeNBT();
     }

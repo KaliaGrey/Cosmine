@@ -3,20 +3,20 @@ package kalia.cosmine.proxy;
 import kalia.cosmine.Cosmine;
 import kalia.cosmine.capability.CapabilityHandler;
 import kalia.cosmine.capability.PlayerSpiritweb;
-import kalia.cosmine.capability.PlayerSpiritwebProvider;
 import kalia.cosmine.config.Config;
+import kalia.cosmine.investiture.allomancy.AllomancySystem;
 import kalia.cosmine.network.NetworkHandler;
+import kalia.cosmine.network.playerspiritweb.PlayerSpiritwebPacket;
 import kalia.cosmine.registry.CapabilityRegistry;
 import kalia.cosmine.registry.InvestitureRegistry;
 import kalia.cosmine.registry.ItemRegistry;
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.world.World;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -40,6 +40,11 @@ public class CommonProxy {
     }
 
     public void init(FMLInitializationEvent event) {
+        MinecraftForge.EVENT_BUS.register(this);
+
+        //MinecraftForge.EVENT_BUS.register(BlockRegistry.class);
+        MinecraftForge.EVENT_BUS.register(ItemRegistry.class);
+
         CapabilityRegistry.register(CapabilityManager.INSTANCE);
         MinecraftForge.EVENT_BUS.register(new CapabilityHandler());
 
@@ -53,13 +58,34 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public static void registerBlocks(RegistryEvent.Register<Block> event) {
-        //BlockRegistry.register(event);
+    public void onPlayerClone(PlayerEvent.Clone event) {
+        EntityPlayer oldPlayer = event.getOriginal();
+        PlayerSpiritweb oldSpiritweb = PlayerSpiritweb.getPlayerSpiritWeb(oldPlayer);
+
+        EntityPlayer newPlayer = event.getEntityPlayer();
+        PlayerSpiritweb newSpiritweb = PlayerSpiritweb.getPlayerSpiritWeb(newPlayer);
+
+        if (event.isWasDeath() && !newPlayer.world.getGameRules().getBoolean("keepInventory")) {
+            //Todo: On death (without keepinventory), remove metal reserves
+        }
+
+        newSpiritweb.synchronize(oldSpiritweb);
+        NetworkHandler.INSTANCE.sendTo(new PlayerSpiritwebPacket(newPlayer.getEntityId(), oldSpiritweb), (EntityPlayerMP)newPlayer);
     }
 
     @SubscribeEvent
-    public static void registerItems(RegistryEvent.Register<Item> event) {
-        ItemRegistry.register(event);
+    public void onPlayerLogin(EntityJoinWorldEvent event) {
+        if (event.getEntity() instanceof EntityPlayerMP) {
+            EntityPlayerMP player = (EntityPlayerMP)event.getEntity();
+            PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb(player);
+
+            //Todo: Test Allomancy, Please Remove
+            if (spiritweb.getInherentAllomancy(AllomancySystem.TIN) == null) {
+                spiritweb.setInherentInvestiture(AllomancySystem.TIN, 1.0f);
+            }
+
+            NetworkHandler.INSTANCE.sendTo(new PlayerSpiritwebPacket(player.getEntityId(), spiritweb), player);
+        }
     }
 
     @SubscribeEvent

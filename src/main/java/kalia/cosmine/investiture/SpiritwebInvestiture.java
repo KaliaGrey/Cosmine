@@ -9,10 +9,10 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 //This class represents the total effective power of a specific investiture available on a spiritweb, whether derived from one source or multiple
 public abstract class SpiritwebInvestiture implements INBTSerializable<NBTTagCompound> {
-    public ISpiritweb spiritweb;
-    public Investiture investiture;
-    public long totalActivationTicks;
-    public ActivationLevel activationLevel;
+    protected ISpiritweb spiritweb;
+    protected Investiture investiture;
+    protected long totalActivationTicks;
+    protected ActivationLevel activationLevel;
 
     public SpiritwebInvestiture(ISpiritweb spiritweb, Investiture investiture) {
         this.spiritweb = spiritweb;
@@ -25,6 +25,18 @@ public abstract class SpiritwebInvestiture implements INBTSerializable<NBTTagCom
         this.spiritweb = spiritweb;
         this.investiture = InvestitureRegistry.INVESTITURES.get(nbt.getString("investiture"));
         this.deserializeNBT(nbt);
+    }
+
+    public Investiture getInvestiture() {
+        return this.investiture;
+    }
+
+    public void setActivationLevel(ActivationLevel level) {
+        this.activationLevel = level;
+    }
+
+    public ActivationLevel getActivationLevel() {
+        return this.activationLevel;
     }
 
     public float getEffectiveIntensity() {
@@ -47,6 +59,11 @@ public abstract class SpiritwebInvestiture implements INBTSerializable<NBTTagCom
         }
 
         this.totalActivationTicks++;
+    }
+
+    public void synchronize(SpiritwebInvestiture source) {
+        this.totalActivationTicks = source.totalActivationTicks;
+        this.activationLevel = source.activationLevel;
     }
 
     public NBTTagCompound serializeNBT() {

@@ -3,24 +3,26 @@ package kalia.cosmine.capability;
 import kalia.cosmine.Cosmine;
 import kalia.cosmine.investiture.*;
 import kalia.cosmine.investiture.allomancy.AllomancySystem;
+import kalia.cosmine.investiture.allomancy.InherentAllomancySet;
 import kalia.cosmine.investiture.allomancy.InherentAllomancySource;
 import kalia.cosmine.investiture.allomancy.SpiritwebAllomancy;
+import kalia.cosmine.network.NetworkHandler;
 import kalia.cosmine.network.allomancy.InherentAllomancyPacket;
 import kalia.cosmine.network.playerspiritweb.BurstingStatusPacket;
 import kalia.cosmine.network.playerspiritweb.InherentIdentityIntensityPacket;
 import kalia.cosmine.network.playerspiritweb.SpiritwebInvestiturePacket;
+import kalia.cosmine.network.playerspiritweb.client.ClientInvestitureActivationPacket;
 import kalia.cosmine.registry.InvestitureRegistry;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.Callable;
 
 public class PlayerSpiritweb implements ISpiritweb {
@@ -28,9 +30,9 @@ public class PlayerSpiritweb implements ISpiritweb {
     private float inherentIdentityIntensity;
     private boolean bursting;
 
-    private HashMap<Investiture, SpiritwebInvestiture> spiritwebInvestitures;
+    private SpiritwebInvestitureSet spiritwebInvestitures;
 
-    private HashMap<Investiture, InherentAllomancySource> inherentAllomancySources;
+    private InherentAllomancySet inherentAllomancies;
 
     public static PlayerSpiritweb getPlayerSpiritWeb(EntityPlayer player) {
         return (PlayerSpiritweb)player.getCapability(PlayerSpiritwebProvider.SPIRITWEB, null);
@@ -44,10 +46,12 @@ public class PlayerSpiritweb implements ISpiritweb {
         this.player = player;
         this.inherentIdentityIntensity = 1.0f;
 
-        this.spiritwebInvestitures = new HashMap<Investiture, SpiritwebInvestiture>();
+        this.spiritwebInvestitures = new SpiritwebInvestitureSet(this);
 
-        this.inherentAllomancySources = new HashMap<Investiture, InherentAllomancySource>();
+        this.inherentAllomancies = new InherentAllomancySet(this);
     }
+
+    //region Inherent Identity
 
     public String getIdentity() {
         if (this.player != null) {
@@ -77,45 +81,57 @@ public class PlayerSpiritweb implements ISpiritweb {
         return false;
     }
 
+    //endregion
+
+    //region Duralumin bursting
+
     public boolean isBursting() {
         return this.bursting;
     }
 
+    //endregion
+
+    //region Inherent investitures
+
     public void setInherentInvestiture(Investiture investiture, float intensity) {
-        IInvestitureSource source = null;
+        SpiritwebInvestiture newSpiritwebInvestiture = null;
 
         switch (investiture.system.name) {
             case AllomancySystem.NAME:
-                if (this.inherentAllomancySources.containsKey(investiture)) {
-                    if (intensity > 0) {
-                        source = this.inherentAllomancySources.get(investiture);
-                        source.setIntensity(intensity);
-                    }
-                    else {
-                        this.inherentAllomancySources.remove(investiture);
-                    }
-                }
-                else {
-                    source = new InherentAllomancySource(investiture, intensity);
-                    this.inherentAllomancySources.put(investiture, (InherentAllomancySource)source);
+                boolean createSpiritwebInvestiture = this.inherentAllomancies.get(investiture) == null;
+                sendInherentAllomancyPacket(this.inherentAllomancies.setIntensity(investiture, intensity));
+
+                if (createSpiritwebInvestiture) {
+                    newSpiritwebInvestiture = new SpiritwebAllomancy(this, investiture);
                 }
                 break;
         }
 
-        if (source != null && !this.spiritwebInvestitures.containsKey(investiture)) {
-            this.spiritwebInvestitures.put(investiture, new SpiritwebAllomancy(this, investiture));
+        if (newSpiritwebInvestiture != null) {
+            this.spiritwebInvestitures.set(newSpiritwebInvestiture);
+            this.sendSpiritwebInvestiturePacket(newSpiritwebInvestiture);
         }
     }
 
     public InherentAllomancySource getInherentAllomancy(Investiture investiture) {
-        return this.inherentAllomancySources.get(investiture);
+        return this.inherentAllomancies.get(investiture);
     }
+
+    public void sendInherentAllomancyPacket(InherentAllomancySource inherentAllomancy) {
+        if (!this.player.world.isRemote) {
+            NetworkHandler.INSTANCE.sendTo(new InherentAllomancyPacket(this.player.getEntityId(), inherentAllomancy), (EntityPlayerMP)this.player);
+        }
+    }
+
+    //endregion
+
+    //region Investiture sources
 
     public ArrayList<IInvestitureSource> getInvestitureSources(Investiture investiture) {
         ArrayList<IInvestitureSource> sources = new ArrayList<IInvestitureSource>();
 
         if (investiture.system == InvestitureRegistry.ALLOMANCY) {
-            InherentAllomancySource inherentAllomancy = this.inherentAllomancySources.get(investiture);
+            InherentAllomancySource inherentAllomancy = this.inherentAllomancies.get(investiture);
             if (inherentAllomancy != null) {
                 sources.add(inherentAllomancy);
             }
@@ -124,18 +140,32 @@ public class PlayerSpiritweb implements ISpiritweb {
         return sources;
     }
 
+    //endregion
+
+    //region Spiritweb investitures
+
+    public void setActivationLevel(Investiture investiture, ActivationLevel level) {
+        SpiritwebInvestiture spiritwebInvestiture = this.getSpiritwebInvestiture(investiture);
+        spiritwebInvestiture.setActivationLevel(level);
+        sendSpiritwebInvestiturePacket(spiritwebInvestiture);
+    }
+
     public SpiritwebInvestiture getSpiritwebInvestiture(Investiture investiture) {
         return this.spiritwebInvestitures.get(investiture);
     }
 
-    public void setActivationLevel(Investiture investiture, ActivationLevel level) {
-        this.getSpiritwebInvestiture(investiture).activationLevel = level;
+    public void sendSpiritwebInvestiturePacket(SpiritwebInvestiture spiritwebInvestiture) {
+        if (!this.player.world.isRemote) {
+            NetworkHandler.INSTANCE.sendTo(new SpiritwebInvestiturePacket(this.player.getEntityId(), spiritwebInvestiture), (EntityPlayerMP)this.player);
+        }
     }
 
+    //endregion
+
+    //region Event handlers
+
     public void onWorldTick(TickEvent.WorldTickEvent event) {
-        for (SpiritwebInvestiture spiritwebInvestiture : this.spiritwebInvestitures.values()) {
-            spiritwebInvestiture.applyInvestitureToEntity(event, this.player);
-        }
+        this.spiritwebInvestitures.applyInvestituresToEntity(event, this.player);
 
         //Todo: Check for deactivate bursting
     }
@@ -146,36 +176,34 @@ public class PlayerSpiritweb implements ISpiritweb {
     }
 
     public void onSpiritwebInvestiturePacket(SpiritwebInvestiturePacket packet) {
-        Investiture investiture = InvestitureRegistry.INVESTITURES.get(packet.investiture);
-        SpiritwebInvestiture spiritwebInvestiture = this.spiritwebInvestitures.get(investiture);
-
-        if (spiritwebInvestiture != null) {
-            spiritwebInvestiture.deserializeNBT(packet.nbt);
-            Cosmine.logger.debug(String.format("Updated %s%n's %s%n SpiritwebInvestiture", this.getIdentity(), investiture.name));
-        }
-        else {
-            this.spiritwebInvestitures.put(investiture, investiture.system.createSpiritwebInvestiture(this, packet.nbt));
-            Cosmine.logger.debug(String.format("Created %s%n's %s%n SpiritwebInvestiture", this.getIdentity(), investiture.name));
-        }
+        this.spiritwebInvestitures.onSpiritwebInvestiturePacket(packet);
     }
 
     public void onInherentAllomancyPacket(InherentAllomancyPacket packet) {
-        Investiture investiture = InvestitureRegistry.INVESTITURES.get(packet.investiture);
-        InherentAllomancySource inherentAllomancy = this.inherentAllomancySources.get(investiture);
-
-        if (inherentAllomancy != null) {
-            inherentAllomancy.deserializeNBT(packet.nbt);
-            Cosmine.logger.debug(String.format("Updated %s%n's %s%n InherentAllomancySource", this.getIdentity(), investiture.name));
-        }
-        else {
-            this.inherentAllomancySources.put(investiture, new InherentAllomancySource(packet.nbt));
-            Cosmine.logger.debug(String.format("Created %s%n's %s%n InherentAllomancySource", this.getIdentity(), investiture.name));
-        }
+        this.inherentAllomancies.onInherentAllomancyPacket(packet);
     }
 
     public void onBurstingStatusPacket(BurstingStatusPacket packet) {
         this.bursting = packet.bursting;
         Cosmine.logger.debug(String.format("Updated %s%n's bursting status to %s%n", this.getIdentity(), this.getIdentityIntensity()));
+    }
+
+    public void onClientInvestitureActivationPacket(ClientInvestitureActivationPacket packet) {
+        this.setActivationLevel(InvestitureRegistry.INVESTITURES.get(packet.investiture), packet.level);
+    }
+
+    //endregion
+
+    //region (De)serialization
+
+    public void synchronize(PlayerSpiritweb source) {
+        this.player = source.player;
+        this.inherentIdentityIntensity = source.inherentIdentityIntensity;
+        this.bursting = source.bursting;
+
+        this.spiritwebInvestitures.synchronize(source.spiritwebInvestitures);
+
+        //Todo: Synchronise inherent allomancies
     }
 
     public NBTTagCompound serializeNBT() {
@@ -185,17 +213,9 @@ public class PlayerSpiritweb implements ISpiritweb {
         nbt.setFloat("inherentIdentityIntensity", this.getIdentityIntensity());
         nbt.setBoolean("bursting", this.isBursting());
 
-        NBTTagList spiritwebInvestituresNBT = new NBTTagList();
-        for (SpiritwebInvestiture spiritwebInvestiture : this.spiritwebInvestitures.values()) {
-            spiritwebInvestituresNBT.appendTag(spiritwebInvestiture.serializeNBT());
-        }
-        nbt.setTag("spiritwebInvestitures", spiritwebInvestituresNBT);
+        nbt.setTag("spiritwebInvestitures", this.spiritwebInvestitures.serializeNBT());
 
-        NBTTagList inherentAllomanciesNBT = new NBTTagList();
-        for (InherentAllomancySource inherentAllomancy : this.inherentAllomancySources.values()) {
-            inherentAllomanciesNBT.appendTag(inherentAllomancy.serializeNBT());
-        }
-        nbt.setTag("inherentAllomancies", inherentAllomanciesNBT);
+        nbt.setTag("inherentAllomancies", this.inherentAllomancies.serializeNBT());
 
         return nbt;
     }
@@ -205,35 +225,14 @@ public class PlayerSpiritweb implements ISpiritweb {
             this.inherentIdentityIntensity = nbt.getFloat("inherentIdentityIntensity");
             this.bursting = nbt.getBoolean("bursting");
 
-            NBTTagList spiritwebInvestituresNBT = nbt.getTagList("spiritwebInvestitures", Constants.NBT.TAG_COMPOUND);
-            for (NBTBase listNBT : spiritwebInvestituresNBT) {
-                NBTTagCompound spiritwebInvestitureNBT = (NBTTagCompound)listNBT;
-                Investiture investiture = InvestitureRegistry.INVESTITURES.get(spiritwebInvestitureNBT.getString("investiture"));
-                SpiritwebInvestiture spiritwebInvestiture = this.spiritwebInvestitures.get(investiture);
+            this.spiritwebInvestitures.deserializeNBT(nbt.getTagList("spiritwebInvestitures", Constants.NBT.TAG_COMPOUND));
 
-                if (spiritwebInvestiture != null) {
-                    spiritwebInvestiture.deserializeNBT(spiritwebInvestitureNBT);
-                }
-                else {
-                    this.spiritwebInvestitures.put(investiture, investiture.system.createSpiritwebInvestiture(this, spiritwebInvestitureNBT));
-                }
-            }
-
-            NBTTagList inherentAllomanciesNBT = nbt.getTagList("inherentAllomancies", Constants.NBT.TAG_COMPOUND);
-            for (NBTBase listNBT : inherentAllomanciesNBT) {
-                NBTTagCompound inherentAllomancyNBT = (NBTTagCompound)listNBT;
-                Investiture investiture = InvestitureRegistry.INVESTITURES.get(inherentAllomancyNBT.getString("investiture"));
-                InherentAllomancySource inherentAllomancy = this.inherentAllomancySources.get(investiture);
-
-                if (inherentAllomancy != null) {
-                    inherentAllomancy.deserializeNBT(inherentAllomancyNBT);
-                }
-                else {
-                    this.inherentAllomancySources.put(investiture, new InherentAllomancySource(inherentAllomancyNBT));
-                }
-            }
+            this.inherentAllomancies.deserializeNBT(nbt.getTagList("inherentAllomancies", Constants.NBT.TAG_COMPOUND));
         }
     }
+
+    //endregion
+
 
     public static class Storage implements Capability.IStorage<ISpiritweb> {
         public static final Storage INSTANCE = new Storage();

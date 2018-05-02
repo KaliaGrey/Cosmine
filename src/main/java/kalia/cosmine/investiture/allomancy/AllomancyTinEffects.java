@@ -17,7 +17,7 @@ public class AllomancyTinEffects implements IInvestitureEffects {
 
     public void applySavantEffectsToEntity(Entity entity, SpiritwebInvestiture investiture) {
         if (entity instanceof EntityLivingBase) {
-            if (investiture.activationLevel != ActivationLevel.NONE) {
+            if (investiture.getActivationLevel() != ActivationLevel.NONE) {
                 ((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.NIGHT_VISION, 2));
             }
             else {

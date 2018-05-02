@@ -33,6 +33,10 @@ public class InherentAllomancySource implements IInvestitureSource, INBTSerializ
         return this.intensity;
     }
 
+    public void synchronize(InherentAllomancySource source) {
+        this.intensity = source.intensity;
+    }
+
     public NBTTagCompound serializeNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
 
