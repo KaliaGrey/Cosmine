@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Cosmine.MOD_ID, name = Cosmine.MOD_NAME, version = Cosmine.MOD_VERSION, /*dependencies = "required-after:Forge@[14.23.3.2655,)",*/ useMetadata = true)
@@ -37,5 +38,9 @@ public class Cosmine {
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         proxy.postInit(event);
+    }
+
+    public static void log(Level level, String content) {
+        logger.log(Level.INFO, content); //Overriding log level since Forge doesn't show Debug-level logs
     }
 }

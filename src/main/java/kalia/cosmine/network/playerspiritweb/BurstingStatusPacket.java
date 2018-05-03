@@ -30,7 +30,7 @@ public class BurstingStatusPacket implements IMessage {
         this.bursting = false;
     }
 
-    public BurstingStatusPacket(ISpiritweb spiritweb) {
+    public BurstingStatusPacket(int entityID, ISpiritweb spiritweb) {
         this.entityID = entityID;
         this.bursting = spiritweb.isBursting();
     }

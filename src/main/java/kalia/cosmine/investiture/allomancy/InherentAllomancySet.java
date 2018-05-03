@@ -9,6 +9,7 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.INBTSerializable;
+import org.apache.logging.log4j.Level;
 
 import java.util.HashMap;
 
@@ -37,17 +38,17 @@ public class InherentAllomancySet implements INBTSerializable<NBTTagList> {
         if (inherentAllomancy != null) {
             inherentAllomancy.setIntensity(intensity);
             if (inherentAllomancy.getIntensity() > 0) {
-                Cosmine.logger.debug(String.format("Updated %s%n's %s%n InherentAllomancySource", this.spiritweb.getIdentity(), investiture.name));
+                Cosmine.log(Level.DEBUG, String.format("Updated %s's %s InherentAllomancySource", this.spiritweb.getIdentity(), investiture.name));
             }
             else {
                 this.remove(investiture);
-                Cosmine.logger.debug(String.format("Removed %s%n's %s%n InherentAllomancySource", this.spiritweb.getIdentity(), investiture.name));
+                Cosmine.log(Level.DEBUG, String.format("Removed %s's %s InherentAllomancySource", this.spiritweb.getIdentity(), investiture.name));
             }
         }
         else {
             inherentAllomancy = new InherentAllomancySource(investiture, intensity);
             this.set(inherentAllomancy);
-            Cosmine.logger.debug(String.format("Created %s%n's %s%n InherentAllomancySource", this.spiritweb.getIdentity(), investiture.name));
+            Cosmine.log(Level.DEBUG, String.format("Created %s's %s InherentAllomancySource", this.spiritweb.getIdentity(), investiture.name));
         }
 
         return inherentAllomancy;

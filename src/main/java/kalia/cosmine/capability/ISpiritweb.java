@@ -9,7 +9,6 @@ import kalia.cosmine.network.playerspiritweb.SpiritwebInvestiturePacket;
 import kalia.cosmine.network.playerspiritweb.client.ClientInvestitureActivationPacket;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.ArrayList;
 
@@ -29,7 +28,7 @@ public interface ISpiritweb extends IIdentitySource, INBTSerializable<NBTTagComp
 
     void synchronize(PlayerSpiritweb source);
 
-    void onWorldTick(TickEvent.WorldTickEvent event);
+    void onTick();
 
     void onInherentIdentityIntensityPacket(InherentIdentityIntensityPacket packet);
     void onSpiritwebInvestiturePacket(SpiritwebInvestiturePacket packet);

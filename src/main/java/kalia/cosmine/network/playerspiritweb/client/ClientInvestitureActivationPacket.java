@@ -5,8 +5,7 @@ import kalia.cosmine.capability.PlayerSpiritweb;
 import kalia.cosmine.investiture.ActivationLevel;
 import kalia.cosmine.investiture.Investiture;
 import kalia.cosmine.network.PacketHandler;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -45,7 +44,7 @@ public class ClientInvestitureActivationPacket implements IMessage {
     public static class Handler extends PacketHandler<ClientInvestitureActivationPacket> {
         @Override
         protected void handleMessage(ClientInvestitureActivationPacket message, MessageContext context) {
-            EntityPlayer player = (EntityPlayer)Minecraft.getMinecraft().world.getEntityByID(message.entityID);
+            EntityPlayerMP player = context.getServerHandler().player; //Todo: Check this always works correctly, may make entityID redundant?
             PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb(player);
 
             spiritweb.onClientInvestitureActivationPacket(message);

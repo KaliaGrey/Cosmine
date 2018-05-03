@@ -1,7 +1,6 @@
 package kalia.cosmine.proxy;
 
 import kalia.cosmine.Cosmine;
-import kalia.cosmine.capability.CapabilityHandler;
 import kalia.cosmine.capability.PlayerSpiritweb;
 import kalia.cosmine.config.Config;
 import kalia.cosmine.investiture.allomancy.AllomancySystem;
@@ -9,7 +8,6 @@ import kalia.cosmine.network.NetworkHandler;
 import kalia.cosmine.network.playerspiritweb.PlayerSpiritwebPacket;
 import kalia.cosmine.registry.CapabilityRegistry;
 import kalia.cosmine.registry.InvestitureRegistry;
-import kalia.cosmine.registry.ItemRegistry;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
@@ -22,7 +20,6 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.io.File;
 
@@ -42,11 +39,7 @@ public class CommonProxy {
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
 
-        //MinecraftForge.EVENT_BUS.register(BlockRegistry.class);
-        MinecraftForge.EVENT_BUS.register(ItemRegistry.class);
-
         CapabilityRegistry.register(CapabilityManager.INSTANCE);
-        MinecraftForge.EVENT_BUS.register(new CapabilityHandler());
 
         InvestitureRegistry.register();
     }
@@ -58,23 +51,25 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public void onPlayerClone(PlayerEvent.Clone event) {
-        EntityPlayer oldPlayer = event.getOriginal();
-        PlayerSpiritweb oldSpiritweb = PlayerSpiritweb.getPlayerSpiritWeb(oldPlayer);
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (event.getEntity() instanceof EntityPlayerMP) {
+            EntityPlayer oldPlayer = event.getOriginal();
+            PlayerSpiritweb oldSpiritweb = PlayerSpiritweb.getPlayerSpiritWeb(oldPlayer);
 
-        EntityPlayer newPlayer = event.getEntityPlayer();
-        PlayerSpiritweb newSpiritweb = PlayerSpiritweb.getPlayerSpiritWeb(newPlayer);
+            EntityPlayer newPlayer = event.getEntityPlayer();
+            PlayerSpiritweb newSpiritweb = PlayerSpiritweb.getPlayerSpiritWeb(newPlayer);
 
-        if (event.isWasDeath() && !newPlayer.world.getGameRules().getBoolean("keepInventory")) {
-            //Todo: On death (without keepinventory), remove metal reserves
+            if (event.isWasDeath() && !newPlayer.world.getGameRules().getBoolean("keepInventory")) {
+                //Todo: On death (without keepinventory), remove metal reserves
+            }
+
+            newSpiritweb.synchronize(oldSpiritweb);
+            NetworkHandler.INSTANCE.sendTo(new PlayerSpiritwebPacket(newPlayer.getEntityId(), oldSpiritweb), (EntityPlayerMP) newPlayer);
         }
-
-        newSpiritweb.synchronize(oldSpiritweb);
-        NetworkHandler.INSTANCE.sendTo(new PlayerSpiritwebPacket(newPlayer.getEntityId(), oldSpiritweb), (EntityPlayerMP)newPlayer);
     }
 
     @SubscribeEvent
-    public void onPlayerLogin(EntityJoinWorldEvent event) {
+    public static void onPlayerLogin(EntityJoinWorldEvent event) {
         if (event.getEntity() instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP)event.getEntity();
             PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb(player);
@@ -89,11 +84,9 @@ public class CommonProxy {
     }
 
     @SubscribeEvent
-    public void onWorldTick(TickEvent.WorldTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            for (EntityPlayer player : event.world.playerEntities) {
-                PlayerSpiritweb.getPlayerSpiritWeb(player).onWorldTick(event);
-            }
+    public void onPlayerUpdate(PlayerEvent.LivingUpdateEvent event) {
+        if (event.getEntity() instanceof EntityPlayer) {
+            PlayerSpiritweb.getPlayerSpiritWeb((EntityPlayer)event.getEntity()).onTick();
         }
     }
 }

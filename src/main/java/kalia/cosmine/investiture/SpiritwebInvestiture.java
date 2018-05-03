@@ -49,10 +49,8 @@ public abstract class SpiritwebInvestiture implements INBTSerializable<NBTTagCom
         return sum;
     }
 
-    public void applyInvestitureToEntity(TickEvent.WorldTickEvent event, Entity entity) {
-        if (this.activationLevel != ActivationLevel.NONE) {
-            this.investiture.effects.applyEffectsToEntity(entity, this);
-        }
+    public void applyInvestitureToEntity(Entity entity) {
+        this.investiture.effects.applyEffectsToEntity(entity, this);
 
         if (this.totalActivationTicks > (this.investiture.savantThreshold * 1200)) {
             this.investiture.effects.applySavantEffectsToEntity(entity, this);

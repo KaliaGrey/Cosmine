@@ -9,15 +9,15 @@ import kalia.cosmine.network.playerspiritweb.client.ClientInvestitureActivationP
 import kalia.cosmine.registry.KeyBindingRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Mod.EventBusSubscriber(Side.CLIENT)
 public class InputHandler {
-    @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public void onKeyInput(InputEvent.KeyInputEvent event) {
+    public static void onKeyInput(InputEvent.KeyInputEvent event) {
         if (KeyBindingRegistry.TEST_KEY.isPressed()) {
             EntityPlayer player = Minecraft.getMinecraft().player;
             PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb(player);

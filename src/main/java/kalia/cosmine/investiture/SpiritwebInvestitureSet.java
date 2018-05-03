@@ -9,7 +9,7 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.apache.logging.log4j.Level;
 
 import java.util.HashMap;
 
@@ -40,9 +40,9 @@ public class SpiritwebInvestitureSet implements INBTSerializable<NBTTagList> {
         items.remove(investiture);
     }
 
-    public void applyInvestituresToEntity(TickEvent.WorldTickEvent event, EntityPlayer player) {
+    public void applyInvestituresToEntity(EntityPlayer player) {
         for (SpiritwebInvestiture spiritwebInvestiture : this.items.values()) {
-            spiritwebInvestiture.applyInvestitureToEntity(event, player);
+            spiritwebInvestiture.applyInvestitureToEntity(player);
         }
     }
 
@@ -52,11 +52,11 @@ public class SpiritwebInvestitureSet implements INBTSerializable<NBTTagList> {
 
         if (spiritwebInvestiture != null) {
             spiritwebInvestiture.deserializeNBT(packet.nbt);
-            Cosmine.logger.debug(String.format("Updated %s%n's %s%n SpiritwebInvestiture", this.spiritweb.getIdentity(), investiture.name));
+            Cosmine.log(Level.DEBUG, String.format("Updated %s's %s SpiritwebInvestiture", this.spiritweb.getIdentity(), investiture.name));
         }
         else {
             this.items.put(investiture, investiture.system.createSpiritwebInvestiture(this.spiritweb, packet.nbt));
-            Cosmine.logger.debug(String.format("Created %s%n's %s%n SpiritwebInvestiture", this.spiritweb.getIdentity(), investiture.name));
+            Cosmine.log(Level.DEBUG, String.format("Created %s's %s SpiritwebInvestiture", this.spiritweb.getIdentity(), investiture.name));
         }
     }
 
