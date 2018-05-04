@@ -45,7 +45,7 @@ public class InherentAllomancyPacket implements IMessage {
     public static class Handler extends PacketHandler<InherentAllomancyPacket> {
         @Override
         protected void handleMessage(InherentAllomancyPacket message, MessageContext context) {
-            EntityPlayer player = Minecraft.getMinecraft().player;
+            EntityPlayer player = (EntityPlayer)Minecraft.getMinecraft().world.getEntityByID(message.entityID);
             PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb(player);
 
             spiritweb.onInherentAllomancyPacket(message);

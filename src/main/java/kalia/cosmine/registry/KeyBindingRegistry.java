@@ -9,10 +9,11 @@ import org.lwjgl.input.Keyboard;
 
 @SideOnly(Side.CLIENT)
 public class KeyBindingRegistry {
-    public static KeyBinding TEST_KEY;
+    public static final KeyBinding TEST_KEY_1 = new KeyBinding("key.test_1", Keyboard.KEY_Y, "key.categories." + Cosmine.MOD_ID);
+    public static KeyBinding TEST_KEY_2 = new KeyBinding("key.test_2", Keyboard.KEY_U, "key.categories." + Cosmine.MOD_ID);
 
     public static void init() {
-        TEST_KEY = new KeyBinding("key.test", Keyboard.KEY_T, "key.categories." + Cosmine.MOD_ID);
-        ClientRegistry.registerKeyBinding(TEST_KEY);
+        ClientRegistry.registerKeyBinding(TEST_KEY_1);
+        ClientRegistry.registerKeyBinding(TEST_KEY_2);
     }
 }

@@ -77,6 +77,7 @@ public class CommonProxy {
             //Todo: Test Allomancy, Please Remove
             if (spiritweb.getInherentAllomancy(AllomancySystem.TIN) == null) {
                 spiritweb.setInherentInvestiture(AllomancySystem.TIN, 1.0f);
+                spiritweb.setInherentInvestiture(AllomancySystem.PEWTER, 1.0f);
             }
 
             NetworkHandler.INSTANCE.sendTo(new PlayerSpiritwebPacket(player.getEntityId(), spiritweb), player);

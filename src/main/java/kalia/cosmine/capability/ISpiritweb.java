@@ -6,6 +6,8 @@ import kalia.cosmine.network.allomancy.InherentAllomancyPacket;
 import kalia.cosmine.network.playerspiritweb.BurstingStatusPacket;
 import kalia.cosmine.network.playerspiritweb.InherentIdentityIntensityPacket;
 import kalia.cosmine.network.playerspiritweb.SpiritwebInvestiturePacket;
+import kalia.cosmine.network.playerspiritweb.client.ClientBurstingPacket;
+import kalia.cosmine.network.playerspiritweb.client.ClientCompoundingPacket;
 import kalia.cosmine.network.playerspiritweb.client.ClientInvestitureActivationPacket;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -16,6 +18,8 @@ public interface ISpiritweb extends IIdentitySource, INBTSerializable<NBTTagComp
     boolean hasIdentity(String identity);
     boolean isBursting();
 
+    void setIdentityIntensity(float intensity);
+
     void setInherentInvestiture(Investiture investiture, float intensity);
     InherentAllomancySource getInherentAllomancy(Investiture investiture);
     void sendInherentAllomancyPacket(InherentAllomancySource inherentAllomancy);
@@ -23,6 +27,7 @@ public interface ISpiritweb extends IIdentitySource, INBTSerializable<NBTTagComp
     ArrayList<IInvestitureSource> getInvestitureSources(Investiture investiture);
 
     void setActivationLevel(Investiture investiture, ActivationLevel level);
+    void setCompounding(Investiture investiture, boolean compounding);
     SpiritwebInvestiture getSpiritwebInvestiture(Investiture investiture);
     void sendSpiritwebInvestiturePacket(SpiritwebInvestiture spiritwebInvestiture);
 
@@ -36,4 +41,6 @@ public interface ISpiritweb extends IIdentitySource, INBTSerializable<NBTTagComp
     void onBurstingStatusPacket(BurstingStatusPacket packet);
 
     void onClientInvestitureActivationPacket(ClientInvestitureActivationPacket packet);
+    void onClientCompoundingPacket(ClientCompoundingPacket packet);
+    void onClientBurstingPacket(ClientBurstingPacket packet);
 }

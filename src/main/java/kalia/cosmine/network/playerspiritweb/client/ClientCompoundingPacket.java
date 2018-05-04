@@ -10,44 +10,44 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class ClientInvestitureActivationPacket implements IMessage {
+public class ClientCompoundingPacket implements IMessage {
     public int entityID;
     public String investiture;
-    public ActivationLevel level;
+    public boolean compounding;
 
     @Override
     public void fromBytes(ByteBuf buffer) {
         this.entityID = buffer.readInt();
         this.investiture = ByteBufUtils.readUTF8String(buffer);
-        this.level = ActivationLevel.fromIndex(buffer.readInt());
+        this.compounding = buffer.readBoolean();
     }
 
     @Override
     public  void toBytes(ByteBuf buffer) {
         buffer.writeInt(this.entityID);
         ByteBufUtils.writeUTF8String(buffer, this.investiture);
-        buffer.writeInt(ActivationLevel.toIndex(this.level));
+        buffer.writeBoolean(this.compounding);
     }
 
-    public ClientInvestitureActivationPacket() {
+    public ClientCompoundingPacket() {
         this.entityID = -1;
         this.investiture = null;
-        this.level = ActivationLevel.NONE;
+        this.compounding = false;
     }
 
-    public ClientInvestitureActivationPacket(int entityID, Investiture investiture, ActivationLevel level) {
+    public ClientCompoundingPacket(int entityID, Investiture investiture, boolean compounding) {
         this.entityID = entityID;
         this.investiture = investiture.name;
-        this.level = level;
+        this.compounding = compounding;
     }
 
-    public static class Handler extends PacketHandler<ClientInvestitureActivationPacket> {
+    public static class Handler extends PacketHandler<ClientCompoundingPacket> {
         @Override
-        protected void handleMessage(ClientInvestitureActivationPacket message, MessageContext context) {
+        protected void handleMessage(ClientCompoundingPacket message, MessageContext context) {
             EntityPlayerMP player = context.getServerHandler().player; //Todo: Check this always works correctly, may make entityID redundant?
             PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb(player);
 
-            spiritweb.onClientInvestitureActivationPacket(message);
+            spiritweb.onClientCompoundingPacket(message);
         }
     }
 }

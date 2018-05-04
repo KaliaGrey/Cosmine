@@ -9,6 +9,8 @@ import kalia.cosmine.network.playerspiritweb.client.ClientInvestitureActivationP
 import kalia.cosmine.registry.KeyBindingRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
@@ -18,7 +20,7 @@ import net.minecraftforge.fml.relauncher.Side;
 public class InputHandler {
     @SubscribeEvent
     public static void onKeyInput(InputEvent.KeyInputEvent event) {
-        if (KeyBindingRegistry.TEST_KEY.isPressed()) {
+        if (KeyBindingRegistry.TEST_KEY_1.isPressed()) {
             EntityPlayer player = Minecraft.getMinecraft().player;
             PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb(player);
             Investiture tinAllomancy = AllomancySystem.TIN;
@@ -28,6 +30,21 @@ public class InputHandler {
             NetworkHandler.INSTANCE.sendToServer(
                 new ClientInvestitureActivationPacket(player.getEntityId(), tinAllomancy, activate ? ActivationLevel.MEDIUM : ActivationLevel.NONE)
             );
+            player.playSound(new SoundEvent(new ResourceLocation("block.fire.extinguish")), 1, 4);
+        }
+
+        if (KeyBindingRegistry.TEST_KEY_2.isPressed()) {
+            EntityPlayer player = Minecraft.getMinecraft().player;
+            PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb(player);
+            Investiture pewterAllomancy = AllomancySystem.PEWTER;
+
+            int currentActivationIndex = ActivationLevel.toIndex(spiritweb.getSpiritwebInvestiture(pewterAllomancy).getActivationLevel());
+            ActivationLevel newActivationLevel = ActivationLevel.fromIndex((currentActivationIndex + 1) % 4);
+
+            NetworkHandler.INSTANCE.sendToServer(
+                new ClientInvestitureActivationPacket(player.getEntityId(), pewterAllomancy, newActivationLevel)
+            );
+            player.playSound(new SoundEvent(new ResourceLocation("block.fire.extinguish")), 1, 4);
         }
     }
 }

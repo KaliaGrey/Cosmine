@@ -11,6 +11,8 @@ import kalia.cosmine.network.allomancy.InherentAllomancyPacket;
 import kalia.cosmine.network.playerspiritweb.BurstingStatusPacket;
 import kalia.cosmine.network.playerspiritweb.InherentIdentityIntensityPacket;
 import kalia.cosmine.network.playerspiritweb.SpiritwebInvestiturePacket;
+import kalia.cosmine.network.playerspiritweb.client.ClientBurstingPacket;
+import kalia.cosmine.network.playerspiritweb.client.ClientCompoundingPacket;
 import kalia.cosmine.network.playerspiritweb.client.ClientInvestitureActivationPacket;
 import kalia.cosmine.registry.InvestitureRegistry;
 import net.minecraft.entity.player.EntityPlayer;
@@ -62,10 +64,6 @@ public class PlayerSpiritweb implements ISpiritweb {
         }
     }
 
-    public float getIdentityIntensity() {
-        return this.inherentIdentityIntensity;
-    }
-
     public boolean hasIdentity(String identity) {
         if (identity.equals(this.getIdentity()) && this.getIdentityIntensity() > 0) {
             return true;
@@ -79,6 +77,19 @@ public class PlayerSpiritweb implements ISpiritweb {
             return false;
         }*/
         return false;
+    }
+
+    public void setIdentityIntensity(float intensity) { //SIDE: SERVER
+        this.inherentIdentityIntensity = intensity;
+        sendInherentIdentityIntensityPacket();
+    }
+
+    public float getIdentityIntensity() {
+        return this.inherentIdentityIntensity;
+    }
+
+    public void sendInherentIdentityIntensityPacket() { //SIDE: SERVER
+        NetworkHandler.INSTANCE.sendTo(new InherentIdentityIntensityPacket(this.player.getEntityId(), this), (EntityPlayerMP)this.player);
     }
 
     //endregion
@@ -157,6 +168,14 @@ public class PlayerSpiritweb implements ISpiritweb {
         sendSpiritwebInvestiturePacket(spiritwebInvestiture);
     }
 
+    public void setCompounding(Investiture investiture, boolean compounding) { //SIDE: SERVER
+        SpiritwebInvestiture spiritwebInvestiture = this.getSpiritwebInvestiture(investiture);
+        if (spiritwebInvestiture instanceof SpiritwebAllomancy) {
+            ((SpiritwebAllomancy)spiritwebInvestiture).setCompounding(compounding);
+            sendSpiritwebInvestiturePacket(spiritwebInvestiture);
+        }
+    }
+
     public SpiritwebInvestiture getSpiritwebInvestiture(Investiture investiture) {
         return this.spiritwebInvestitures.get(investiture);
     }
@@ -169,28 +188,28 @@ public class PlayerSpiritweb implements ISpiritweb {
 
     //region Event handlers
 
-    public void onTick() { //SIDE: SERVER
+    public void onTick() { //SIDE: BOTH
         this.spiritwebInvestitures.applyInvestituresToEntity(this.player);
 
         //Todo: Check for deactivate bursting
     }
 
-    public void onInherentIdentityIntensityPacket(InherentIdentityIntensityPacket packet) { //SIDE: SERVER
+    public void onInherentIdentityIntensityPacket(InherentIdentityIntensityPacket packet) { //SIDE: CLIENT
         this.inherentIdentityIntensity = packet.intensity;
         Cosmine.log(Level.DEBUG, String.format("Updated %s's inherent Identity intensity to %s", this.getIdentity(), this.getIdentityIntensity()));
     }
 
-    public void onSpiritwebInvestiturePacket(SpiritwebInvestiturePacket packet) { //SIDE: SERVER
+    public void onSpiritwebInvestiturePacket(SpiritwebInvestiturePacket packet) { //SIDE: CLIENT
         this.spiritwebInvestitures.onSpiritwebInvestiturePacket(packet);
     }
 
-    public void onInherentAllomancyPacket(InherentAllomancyPacket packet) { //SIDE: SERVER
+    public void onInherentAllomancyPacket(InherentAllomancyPacket packet) { //SIDE: CLIENT
         this.inherentAllomancies.onInherentAllomancyPacket(packet);
     }
 
-    public void onBurstingStatusPacket(BurstingStatusPacket packet) { //SIDE: SERVER
+    public void onBurstingStatusPacket(BurstingStatusPacket packet) { //SIDE: CLIENT
         this.bursting = packet.bursting;
-        Cosmine.log(Level.DEBUG, String.format("Updated %s's bursting status to %s", this.getIdentity(), this.getIdentityIntensity()));
+        Cosmine.log(Level.DEBUG, String.format("Updated %s's bursting status to %s", this.getIdentity(), this.isBursting()));
     }
 
     public void onClientInvestitureActivationPacket(ClientInvestitureActivationPacket packet) { //SIDE: SERVER
@@ -198,6 +217,15 @@ public class PlayerSpiritweb implements ISpiritweb {
         Cosmine.log(Level.DEBUG, String.format("Updated %s's %s activation to %s", this.getIdentity(), packet.investiture, packet.level.toString()));
     }
 
+    public void onClientCompoundingPacket(ClientCompoundingPacket packet) { //SIDE: SERVER
+        this.setCompounding(InvestitureRegistry.INVESTITURES.get(packet.investiture), packet.compounding);
+        Cosmine.log(Level.DEBUG, String.format("Updated %s's %s compounding to %s", this.getIdentity(), packet.investiture, packet.compounding));
+    }
+
+    public void onClientBurstingPacket(ClientBurstingPacket packet) { //SIDE: SERVER
+        this.setBursting(packet.bursting);
+        Cosmine.log(Level.DEBUG, String.format("Updated %s's bursting status to %s", this.getIdentity(), packet.bursting));
+    }
     //endregion
 
     //region (De)serialization

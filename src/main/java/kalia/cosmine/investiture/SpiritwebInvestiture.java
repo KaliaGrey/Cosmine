@@ -5,7 +5,6 @@ import kalia.cosmine.registry.InvestitureRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 //This class represents the total effective power of a specific investiture available on a spiritweb, whether derived from one source or multiple
 public abstract class SpiritwebInvestiture implements INBTSerializable<NBTTagCompound> {
@@ -13,12 +12,14 @@ public abstract class SpiritwebInvestiture implements INBTSerializable<NBTTagCom
     protected Investiture investiture;
     protected long totalActivationTicks;
     protected ActivationLevel activationLevel;
+    protected ActivationLevel lastTickActivationLevel;
 
     public SpiritwebInvestiture(ISpiritweb spiritweb, Investiture investiture) {
         this.spiritweb = spiritweb;
         this.investiture = investiture;
         this.totalActivationTicks = 0;
         this.activationLevel = ActivationLevel.NONE;
+        this.lastTickActivationLevel = ActivationLevel.NONE;
     }
 
     public SpiritwebInvestiture(ISpiritweb spiritweb, NBTTagCompound nbt) {
@@ -49,13 +50,16 @@ public abstract class SpiritwebInvestiture implements INBTSerializable<NBTTagCom
         return sum;
     }
 
+    public abstract boolean canUse();
+
     public void applyInvestitureToEntity(Entity entity) {
-        this.investiture.effects.applyEffectsToEntity(entity, this);
+        this.investiture.effects.applyEffectsToEntity(entity, this, this.lastTickActivationLevel);
 
         if (this.totalActivationTicks > (this.investiture.savantThreshold * 1200)) {
-            this.investiture.effects.applySavantEffectsToEntity(entity, this);
+            this.investiture.effects.applySavantEffectsToEntity(entity, this, this.lastTickActivationLevel);
         }
 
+        this.lastTickActivationLevel = this.activationLevel;
         this.totalActivationTicks++;
     }
 

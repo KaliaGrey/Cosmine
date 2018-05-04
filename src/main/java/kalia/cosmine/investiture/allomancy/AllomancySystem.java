@@ -8,12 +8,15 @@ import net.minecraft.nbt.NBTTagCompound;
 public class AllomancySystem extends InvestitureSystem {
     public static final String NAME = "allomancy";
 
+    public static Investiture PEWTER = null;
     public static Investiture TIN = null;
+
 
     public AllomancySystem() {
         super(NAME);
 
-        TIN = registerInvestiture(new Investiture(this,"tin", 300, new AllomancyTinEffects()));
+        PEWTER = registerInvestiture(new Investiture(this, "pewter", 500, new AllomancyPewterEffects()));
+        TIN = registerInvestiture(new Investiture(this, "tin", 300, new AllomancyTinEffects()));
     }
 
     public SpiritwebAllomancy createSpiritwebInvestiture(ISpiritweb spiritweb, NBTTagCompound nbt) {
