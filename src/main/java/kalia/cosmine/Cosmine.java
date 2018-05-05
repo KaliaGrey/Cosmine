@@ -1,5 +1,6 @@
 package kalia.cosmine;
 
+import kalia.cosmine.command.DebugSpiritwebCommand;
 import kalia.cosmine.command.InherentInvestitureCommand;
 import kalia.cosmine.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Mod;
@@ -45,6 +46,8 @@ public class Cosmine {
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new InherentInvestitureCommand());
+
+        event.registerServerCommand(new DebugSpiritwebCommand());
     }
 
     public static void log(Level level, String content) {

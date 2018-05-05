@@ -3,7 +3,7 @@ package kalia.cosmine.input;
 import kalia.cosmine.capability.PlayerSpiritweb;
 import kalia.cosmine.investiture.ActivationLevel;
 import kalia.cosmine.investiture.Investiture;
-import kalia.cosmine.investiture.allomancy.AllomancySystem;
+import kalia.cosmine.investiture.allomancy.Allomancy;
 import kalia.cosmine.network.NetworkHandler;
 import kalia.cosmine.network.playerspiritweb.client.ClientInvestitureActivationPacket;
 import kalia.cosmine.registry.KeyBindingRegistry;
@@ -23,28 +23,32 @@ public class InputHandler {
         if (KeyBindingRegistry.TEST_KEY_1.isPressed()) {
             EntityPlayer player = Minecraft.getMinecraft().player;
             PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb(player);
-            Investiture tinAllomancy = AllomancySystem.TIN;
+            Investiture tinAllomancy = Allomancy.TIN;
 
-            boolean activate = spiritweb.getSpiritwebInvestiture(tinAllomancy).getActivationLevel() == ActivationLevel.NONE;
+            if (spiritweb.getInherentAllomancy(tinAllomancy) != null) {
+                boolean activate = spiritweb.getSpiritwebInvestiture(tinAllomancy).getActivationLevel() == ActivationLevel.NONE;
 
-            NetworkHandler.INSTANCE.sendToServer(
-                new ClientInvestitureActivationPacket(player.getEntityId(), tinAllomancy, activate ? ActivationLevel.MEDIUM : ActivationLevel.NONE)
-            );
-            player.playSound(new SoundEvent(new ResourceLocation("block.fire.extinguish")), 1, 4);
+                NetworkHandler.INSTANCE.sendToServer(
+                        new ClientInvestitureActivationPacket(player.getEntityId(), tinAllomancy, activate ? ActivationLevel.MEDIUM : ActivationLevel.NONE)
+                );
+                player.playSound(new SoundEvent(new ResourceLocation("block.fire.extinguish")), 1, 4);
+            }
         }
 
         if (KeyBindingRegistry.TEST_KEY_2.isPressed()) {
             EntityPlayer player = Minecraft.getMinecraft().player;
             PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb(player);
-            Investiture pewterAllomancy = AllomancySystem.PEWTER;
+            Investiture pewterAllomancy = Allomancy.PEWTER;
 
-            int currentActivationIndex = ActivationLevel.toIndex(spiritweb.getSpiritwebInvestiture(pewterAllomancy).getActivationLevel());
-            ActivationLevel newActivationLevel = ActivationLevel.fromIndex((currentActivationIndex + 1) % 4);
+            if (spiritweb.getInherentAllomancy(pewterAllomancy) != null) {
+                int currentActivationIndex = ActivationLevel.toIndex(spiritweb.getSpiritwebInvestiture(pewterAllomancy).getActivationLevel());
+                ActivationLevel newActivationLevel = ActivationLevel.fromIndex((currentActivationIndex + 1) % 4);
 
-            NetworkHandler.INSTANCE.sendToServer(
-                new ClientInvestitureActivationPacket(player.getEntityId(), pewterAllomancy, newActivationLevel)
-            );
-            player.playSound(new SoundEvent(new ResourceLocation("block.fire.extinguish")), 1, 4);
+                NetworkHandler.INSTANCE.sendToServer(
+                        new ClientInvestitureActivationPacket(player.getEntityId(), pewterAllomancy, newActivationLevel)
+                );
+                player.playSound(new SoundEvent(new ResourceLocation("block.fire.extinguish")), 1, 4);
+            }
         }
     }
 }

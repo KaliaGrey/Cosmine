@@ -4,9 +4,9 @@
   "description": "Brandon Sanderson's Cosmere comes to Minecraft",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "logoFile": "assets/examplemod/textures/logo.png",
-  "url": "minecraftforge.net/",
-  "updateJSON": "minecraftforge.net/versions.json",
-  "authorList": ["Author"],
-  "credits": "I'd like to thank my mother and father."
+  "logoFile": "assets/cosmine/textures/logo.png",
+  "url": "electricsheep.kalia.io",
+  "updateJSON": "",
+  "authorList": ["Kalia Grey"],
+  "credits": "Brandon Sanderson, for creating such an incredibly in-depth universe. Legobmw99 for making the previous Cosmere-related mods and sending some tips my way. AgentEpsilon for reviewing my code, researching Forge and being a good rubber duck."
 }]

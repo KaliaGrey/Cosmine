@@ -2,12 +2,15 @@ package kalia.cosmine.investiture;
 
 import kalia.cosmine.Cosmine;
 import kalia.cosmine.capability.ISpiritweb;
+import kalia.cosmine.investiture.allomancy.InherentAllomancySource;
 import kalia.cosmine.network.playerspiritweb.SpiritwebInvestiturePacket;
 import kalia.cosmine.registry.InvestitureRegistry;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.apache.logging.log4j.Level;
 
@@ -47,7 +50,7 @@ public class SpiritwebInvestitureSet implements INBTSerializable<NBTTagList> {
     }
 
     public void onSpiritwebInvestiturePacket(SpiritwebInvestiturePacket packet) {
-        Investiture investiture = InvestitureRegistry.INVESTITURES.get(packet.investiture);
+        Investiture investiture = InvestitureRegistry.getInvestiture(packet.investiture);
         SpiritwebInvestiture spiritwebInvestiture = this.items.get(investiture);
 
         if (spiritwebInvestiture != null) {
@@ -81,7 +84,7 @@ public class SpiritwebInvestitureSet implements INBTSerializable<NBTTagList> {
     public void deserializeNBT(NBTTagList nbt) {
         for (NBTBase itemNBT : nbt) {
             NBTTagCompound spiritwebInvestitureNBT = (NBTTagCompound)itemNBT;
-            Investiture investiture = InvestitureRegistry.INVESTITURES.get(spiritwebInvestitureNBT.getString("investiture"));
+            Investiture investiture = InvestitureRegistry.getInvestiture(spiritwebInvestitureNBT.getString("investiture"));
             SpiritwebInvestiture spiritwebInvestiture = this.items.get(investiture);
 
             if (spiritwebInvestiture != null) {
@@ -90,6 +93,17 @@ public class SpiritwebInvestitureSet implements INBTSerializable<NBTTagList> {
             else {
                 this.items.put(investiture, investiture.system.createSpiritwebInvestiture(this.spiritweb, spiritwebInvestitureNBT));
             }
+        }
+    }
+
+    public void printDebugInformation(ICommandSender sender) {
+        for (SpiritwebInvestiture spiritwebInvestiture : this.items.values()) {
+            sender.sendMessage(new TextComponentString(String.format(
+                    "Investiture: %s (%s) - %s",
+                    spiritwebInvestiture.getInvestiture().name,
+                    spiritwebInvestiture.getEffectiveIntensity(),
+                    spiritwebInvestiture.activationLevel.toString()
+            )));
         }
     }
 }

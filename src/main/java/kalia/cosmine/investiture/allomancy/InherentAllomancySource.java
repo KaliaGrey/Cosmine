@@ -17,7 +17,7 @@ public class InherentAllomancySource implements IInvestitureSource, INBTSerializ
     }
 
     public InherentAllomancySource(NBTTagCompound nbt) {
-        this.investiture = InvestitureRegistry.INVESTITURES.get(nbt.getString("investiture"));
+        this.investiture = InvestitureRegistry.getInvestiture(nbt.getString("investiture"));
         this.deserializeNBT(nbt);
     }
 

@@ -3,7 +3,6 @@ package kalia.cosmine.proxy;
 import kalia.cosmine.Cosmine;
 import kalia.cosmine.capability.PlayerSpiritweb;
 import kalia.cosmine.config.Config;
-import kalia.cosmine.investiture.allomancy.AllomancySystem;
 import kalia.cosmine.network.NetworkHandler;
 import kalia.cosmine.network.playerspiritweb.PlayerSpiritwebPacket;
 import kalia.cosmine.registry.CapabilityRegistry;
@@ -73,12 +72,6 @@ public class CommonProxy {
         if (event.getEntity() instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP)event.getEntity();
             PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb(player);
-
-            //Todo: Test Allomancy, Please Remove
-            if (spiritweb.getInherentAllomancy(AllomancySystem.TIN) == null) {
-                spiritweb.setInherentInvestiture(AllomancySystem.TIN, 1.0f);
-                spiritweb.setInherentInvestiture(AllomancySystem.PEWTER, 1.0f);
-            }
 
             NetworkHandler.INSTANCE.sendTo(new PlayerSpiritwebPacket(player.getEntityId(), spiritweb), player);
         }

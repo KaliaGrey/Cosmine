@@ -1,0 +1,5 @@
+itemGroup.cosmine=Cosmine
+
+commands.inherentinvestiture.usage=inherentinvestiture <add/remove> <system:investiture> [intensity]
+
+item.cosmine.nuggetlerasium.name=Lerasium Nugget

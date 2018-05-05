@@ -5,9 +5,11 @@ import kalia.cosmine.capability.ISpiritweb;
 import kalia.cosmine.investiture.Investiture;
 import kalia.cosmine.network.allomancy.InherentAllomancyPacket;
 import kalia.cosmine.registry.InvestitureRegistry;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.apache.logging.log4j.Level;
 
@@ -63,7 +65,7 @@ public class InherentAllomancySet implements INBTSerializable<NBTTagList> {
     }
 
     public void onInherentAllomancyPacket(InherentAllomancyPacket packet) {
-        Investiture investiture = InvestitureRegistry.INVESTITURES.get(packet.investiture);
+        Investiture investiture = InvestitureRegistry.getInvestiture(packet.investiture);
         setIntensity(investiture, packet.nbt.getFloat("intensity"));
     }
 
@@ -87,7 +89,7 @@ public class InherentAllomancySet implements INBTSerializable<NBTTagList> {
     public void deserializeNBT(NBTTagList nbt) {
         for (NBTBase itemNBT : nbt) {
             NBTTagCompound inherentAllomancyNBT = (NBTTagCompound)itemNBT;
-            Investiture investiture = InvestitureRegistry.INVESTITURES.get(inherentAllomancyNBT.getString("investiture"));
+            Investiture investiture = InvestitureRegistry.getInvestiture(inherentAllomancyNBT.getString("investiture"));
             InherentAllomancySource inherentAllomancy = this.items.get(investiture);
 
             if (inherentAllomancy != null) {
@@ -96,6 +98,16 @@ public class InherentAllomancySet implements INBTSerializable<NBTTagList> {
             else {
                 this.items.put(investiture, new InherentAllomancySource(inherentAllomancyNBT));
             }
+        }
+    }
+
+    public void printDebugInformation(ICommandSender sender) {
+        for (InherentAllomancySource inherentAllomancy : this.items.values()) {
+            sender.sendMessage(new TextComponentString(String.format(
+                "Inherent Allomancy: %s (%s)",
+                inherentAllomancy.getInvestiture().name,
+                inherentAllomancy.getIntensity()
+            )));
         }
     }
 }

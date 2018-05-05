@@ -29,7 +29,7 @@ public class InherentInvestitureCommand extends CommandBase {
 
     @Override
     public String getUsage(ICommandSender sender) {
-        return "inherentinvestiture <add/remove> <system:investiture> [intensity]";
+        return "commands.inherentinvestiture.usage";
     }
 
     @Override
@@ -44,7 +44,7 @@ public class InherentInvestitureCommand extends CommandBase {
         }
 
         boolean add = args[0].equals("add");
-        Investiture investiture = InvestitureRegistry.INVESTITURES.get(args[1]);
+        Investiture investiture = InvestitureRegistry.getInvestiture(args[1]);
 
         if (investiture == null) {
             sender.sendMessage(new TextComponentString(TextFormatting.RED + "Error parsing investiture!"));

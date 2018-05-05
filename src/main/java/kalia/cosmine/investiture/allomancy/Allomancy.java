@@ -5,14 +5,12 @@ import kalia.cosmine.investiture.Investiture;
 import kalia.cosmine.investiture.InvestitureSystem;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class AllomancySystem extends InvestitureSystem {
+public class Allomancy extends InvestitureSystem {
     public static final String NAME = "allomancy";
 
     public static Investiture PEWTER = null;
     public static Investiture TIN = null;
-
-
-    public AllomancySystem() {
+    public Allomancy() {
         super(NAME);
 
         PEWTER = registerInvestiture(new Investiture(this, "pewter", 500, new AllomancyPewterEffects()));

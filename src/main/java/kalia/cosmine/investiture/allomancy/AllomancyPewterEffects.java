@@ -16,23 +16,27 @@ public class AllomancyPewterEffects implements IInvestitureEffects {
     public void applyEffectsToEntity(Entity entity, SpiritwebInvestiture spiritwebInvestiture, ActivationLevel lastTickActivationLevel) {
         if (entity instanceof EntityLivingBase) {
             EntityLivingBase ent = (EntityLivingBase)entity;
-            if (spiritwebInvestiture.getActivationLevel() != ActivationLevel.NONE) {
-                //Max potion level for a full-intensity Allomancer = 5 (amplifier of 4)
-                int amplifier = Math.min(Math.round(getIntenstiyFactor(spiritwebInvestiture, 4f)), 4) - 1;
+            //Max potion level for a full-intensity Allomancer = 5 (amplifier of 4)
+            int amplifier = Math.min(Math.round(getIntenstiyFactor(spiritwebInvestiture, 4f)), 4) - 1;
 
-                ent.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 2, amplifier, true, false));
-                ent.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 2, amplifier, true, false));
-                ent.removePotionEffect(MobEffects.WEAKNESS);
-            }
+            ent.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 2, amplifier, true, false));
+            ent.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 2, amplifier, true, false));
+            ent.removePotionEffect(MobEffects.WEAKNESS);
         }
+    }
+
+    public void removeEffectsFromEntity(Entity entity, SpiritwebInvestiture spiritwebInvestiture) {
+
     }
 
     public void applySavantEffectsToEntity(Entity entity, SpiritwebInvestiture spiritwebInvestiture, ActivationLevel lastTickActivationLevel) {
         if (entity instanceof EntityLivingBase) {
             EntityLivingBase ent = (EntityLivingBase)entity;
-            if (spiritwebInvestiture.getActivationLevel() != ActivationLevel.NONE) {
-                ent.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 2, 0, true, false));
-            }
+            ent.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 2, 0, true, false));
         }
+    }
+
+    public void removeSavantEffectsFromEntity(Entity entity, SpiritwebInvestiture spiritwebInvestiture) {
+
     }
 }

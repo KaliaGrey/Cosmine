@@ -24,7 +24,7 @@ public abstract class SpiritwebInvestiture implements INBTSerializable<NBTTagCom
 
     public SpiritwebInvestiture(ISpiritweb spiritweb, NBTTagCompound nbt) {
         this.spiritweb = spiritweb;
-        this.investiture = InvestitureRegistry.INVESTITURES.get(nbt.getString("investiture"));
+        this.investiture = InvestitureRegistry.getInvestiture(nbt.getString("investiture"));
         this.deserializeNBT(nbt);
     }
 
@@ -53,7 +53,14 @@ public abstract class SpiritwebInvestiture implements INBTSerializable<NBTTagCom
     public abstract boolean canUse();
 
     public void applyInvestitureToEntity(Entity entity) {
-        this.investiture.effects.applyEffectsToEntity(entity, this, this.lastTickActivationLevel);
+        if (this.getEffectiveIntensity() > 0) {
+            if (this.activationLevel != ActivationLevel.NONE) {
+                this.investiture.effects.applyEffectsToEntity(entity, this, this.lastTickActivationLevel);
+            }
+            else if (this.lastTickActivationLevel != ActivationLevel.NONE) {
+                this.investiture.effects.removeEffectsFromEntity(entity, this);
+            }
+        }
 
         if (this.totalActivationTicks > (this.investiture.savantThreshold * 1200)) {
             this.investiture.effects.applySavantEffectsToEntity(entity, this, this.lastTickActivationLevel);

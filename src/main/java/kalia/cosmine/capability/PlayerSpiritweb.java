@@ -2,7 +2,7 @@ package kalia.cosmine.capability;
 
 import kalia.cosmine.Cosmine;
 import kalia.cosmine.investiture.*;
-import kalia.cosmine.investiture.allomancy.AllomancySystem;
+import kalia.cosmine.investiture.allomancy.Allomancy;
 import kalia.cosmine.investiture.allomancy.InherentAllomancySet;
 import kalia.cosmine.investiture.allomancy.InherentAllomancySource;
 import kalia.cosmine.investiture.allomancy.SpiritwebAllomancy;
@@ -15,11 +15,13 @@ import kalia.cosmine.network.playerspiritweb.client.ClientBurstingPacket;
 import kalia.cosmine.network.playerspiritweb.client.ClientCompoundingPacket;
 import kalia.cosmine.network.playerspiritweb.client.ClientInvestitureActivationPacket;
 import kalia.cosmine.registry.InvestitureRegistry;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import org.apache.logging.log4j.Level;
@@ -117,7 +119,7 @@ public class PlayerSpiritweb implements ISpiritweb {
         SpiritwebInvestiture newSpiritwebInvestiture = null;
 
         switch (investiture.system.name) {
-            case AllomancySystem.NAME:
+            case Allomancy.NAME:
                 boolean createSpiritwebInvestiture = this.inherentAllomancies.get(investiture) == null;
                 sendInherentAllomancyPacket(this.inherentAllomancies.setIntensity(investiture, intensity));
 
@@ -213,12 +215,12 @@ public class PlayerSpiritweb implements ISpiritweb {
     }
 
     public void onClientInvestitureActivationPacket(ClientInvestitureActivationPacket packet) { //SIDE: SERVER
-        this.setActivationLevel(InvestitureRegistry.INVESTITURES.get(packet.investiture), packet.level);
+        this.setActivationLevel(InvestitureRegistry.getInvestiture(packet.investiture), packet.level);
         Cosmine.log(Level.DEBUG, String.format("Updated %s's %s activation to %s", this.getIdentity(), packet.investiture, packet.level.toString()));
     }
 
     public void onClientCompoundingPacket(ClientCompoundingPacket packet) { //SIDE: SERVER
-        this.setCompounding(InvestitureRegistry.INVESTITURES.get(packet.investiture), packet.compounding);
+        this.setCompounding(InvestitureRegistry.getInvestiture(packet.investiture), packet.compounding);
         Cosmine.log(Level.DEBUG, String.format("Updated %s's %s compounding to %s", this.getIdentity(), packet.investiture, packet.compounding));
     }
 
@@ -235,9 +237,9 @@ public class PlayerSpiritweb implements ISpiritweb {
         this.inherentIdentityIntensity = source.inherentIdentityIntensity;
         this.bursting = source.bursting;
 
-        this.spiritwebInvestitures.synchronize(source.spiritwebInvestitures);
+        this.inherentAllomancies.synchronize(source.inherentAllomancies);
 
-        //Todo: Synchronise inherent allomancies
+        this.spiritwebInvestitures.synchronize(source.spiritwebInvestitures);
     }
 
     public NBTTagCompound serializeNBT() {
@@ -267,6 +269,16 @@ public class PlayerSpiritweb implements ISpiritweb {
 
     //endregion
 
+    //region Debug
+
+    public void printDebugInformation(ICommandSender sender) {
+        sender.sendMessage(new TextComponentString(String.format("Inherent Identity: %s (%s)", this.getIdentity(), this.getIdentityIntensity())));
+
+        this.inherentAllomancies.printDebugInformation(sender);
+        this.spiritwebInvestitures.printDebugInformation(sender);
+    }
+
+    //endregion
 
     public static class Storage implements Capability.IStorage<ISpiritweb> {
         public static final Storage INSTANCE = new Storage();
