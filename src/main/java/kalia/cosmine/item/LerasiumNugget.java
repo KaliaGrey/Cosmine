@@ -8,14 +8,12 @@ import kalia.cosmine.investiture.allomancy.InherentAllomancySource;
 import kalia.cosmine.registry.ItemRegistry;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -24,6 +22,13 @@ import net.minecraftforge.client.model.ModelLoader;
 
 public class LerasiumNugget extends ItemFood {
     public static final String REGISTRY_NAME = "nuggetlerasium";
+    
+    private static final Investiture[] ALLOMANCIES = new Investiture[]{
+        Allomancy.STEEL, Allomancy.IRON, Allomancy.PEWTER, Allomancy.TIN,
+        Allomancy.ZINC, Allomancy.BRASS, Allomancy.COPPER, Allomancy.BRONZE,
+        Allomancy.DURALUMIN, Allomancy.ALUMINUM, Allomancy.NICROSIL, Allomancy.CHROMIUM,
+        Allomancy.GOLD, Allomancy.ELECTRUM, Allomancy.CADMIUM, Allomancy.BENDALLOY
+    };
 
     public LerasiumNugget() {
         super(0, false);
@@ -75,9 +80,9 @@ public class LerasiumNugget extends ItemFood {
     public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityLivingBase entityLiving){
         if (entityLiving instanceof EntityPlayerMP) {
             PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb((EntityPlayerMP)entityLiving);
-            spiritweb.setInherentInvestiture(Allomancy.PEWTER, 1.0f);
-            spiritweb.setInherentInvestiture(Allomancy.TIN, 1.0f);
-            //Todo: Add other allomancies when implemented
+            for (Investiture investiture : ALLOMANCIES) {
+                spiritweb.setInherentInvestiture(investiture, 1.0f);
+            }
         }
 
         return super.onItemUseFinish(stack, worldIn, entityLiving);
@@ -86,11 +91,7 @@ public class LerasiumNugget extends ItemFood {
     private static boolean canPlayerUse(EntityPlayer player) {
         PlayerSpiritweb spiritweb = PlayerSpiritweb.getPlayerSpiritWeb(player);
 
-        for (Investiture investiture : (new Investiture[]{
-                Allomancy.PEWTER,
-                Allomancy.TIN
-                //Todo: Add other allomancies when implemented
-        })) {
+        for (Investiture investiture : ALLOMANCIES) {
             InherentAllomancySource allomancy = spiritweb.getInherentAllomancy(investiture);
             if (allomancy == null || allomancy.getIntensity() < 1) {
                 return true;

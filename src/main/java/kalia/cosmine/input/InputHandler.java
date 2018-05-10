@@ -1,6 +1,7 @@
 package kalia.cosmine.input;
 
 import kalia.cosmine.capability.PlayerSpiritweb;
+import kalia.cosmine.gui.AllomancyGui;
 import kalia.cosmine.investiture.ActivationLevel;
 import kalia.cosmine.investiture.Investiture;
 import kalia.cosmine.investiture.allomancy.Allomancy;
@@ -48,6 +49,14 @@ public class InputHandler {
                         new ClientInvestitureActivationPacket(player.getEntityId(), pewterAllomancy, newActivationLevel)
                 );
                 player.playSound(new SoundEvent(new ResourceLocation("block.fire.extinguish")), 1, 4);
+            }
+        }
+
+        if (KeyBindingRegistry.TEST_KEY_3.isPressed()) {
+            Minecraft minecraft = Minecraft.getMinecraft();
+
+            if (minecraft.currentScreen == null) {
+                minecraft.displayGuiScreen(new AllomancyGui());
             }
         }
     }

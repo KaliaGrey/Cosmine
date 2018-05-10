@@ -1,5 +1,23 @@
-itemGroup.cosmine=Cosmine
+investiture.allomancy.aluminum=Aluminum
+investiture.allomancy.bendalloy=Bendalloy
+investiture.allomancy.brass=Brass
+investiture.allomancy.bronze=Bronze
+investiture.allomancy.cadmium=Cadmium
+investiture.allomancy.chromium=Chromium
+investiture.allomancy.copper=Copper
+investiture.allomancy.duralumin=Duralumin
+investiture.allomancy.electrum=Electrum
+investiture.allomancy.gold=Gold
+investiture.allomancy.iron=Iron
+investiture.allomancy.nicrosil=Nicrosil
+investiture.allomancy.pewter=Pewter
+investiture.allomancy.steel=Steel
+investiture.allomancy.tin=Tin
+investiture.allomancy.zinc=Zinc
+
 
 commands.inherentinvestiture.usage=inherentinvestiture <add/remove> <system:investiture> [intensity]
+
+itemGroup.cosmine=Cosmine
 
 item.cosmine.nuggetlerasium.name=Lerasium Nugget

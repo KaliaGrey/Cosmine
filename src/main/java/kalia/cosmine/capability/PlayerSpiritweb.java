@@ -160,6 +160,17 @@ public class PlayerSpiritweb implements ISpiritweb {
         return sources;
     }
 
+    public boolean hasInvestitureSource(Investiture investiture) {
+        if (investiture.system == InvestitureRegistry.ALLOMANCY) {
+            InherentAllomancySource inherentAllomancy = this.inherentAllomancies.get(investiture);
+            if (inherentAllomancy != null && inherentAllomancy.getIntensity() > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     //endregion
 
     //region Spiritweb investitures
