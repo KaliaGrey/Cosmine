@@ -37,7 +37,7 @@ public class ClientCompoundingPacket implements IMessage {
 
     public ClientCompoundingPacket(int entityID, Investiture investiture, boolean compounding) {
         this.entityID = entityID;
-        this.investiture = investiture.name;
+        this.investiture = investiture.fullName;
         this.compounding = compounding;
     }
 

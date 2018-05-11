@@ -38,7 +38,7 @@ public class InherentAllomancyPacket implements IMessage {
 
     public InherentAllomancyPacket(int entityID, InherentAllomancySource inherentAllomancySource) {
         this.entityID = entityID;
-        this.investiture = inherentAllomancySource.getInvestiture().name;
+        this.investiture = inherentAllomancySource.getInvestiture().fullName;
         this.nbt = inherentAllomancySource.serializeNBT();
     }
 

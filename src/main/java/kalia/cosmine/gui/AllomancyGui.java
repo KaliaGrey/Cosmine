@@ -15,35 +15,30 @@ package kalia.cosmine.gui;
 import kalia.cosmine.Cosmine;
 import kalia.cosmine.investiture.Investiture;
 import kalia.cosmine.investiture.allomancy.Allomancy;
+import kalia.cosmine.investiture.allomancy.SpiritwebAllomancy;
 import kalia.cosmine.utils.DrawUtils;
 import kalia.cosmine.utils.MathUtils;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
+import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
 
 public class AllomancyGui extends InvestitureGui {
     private static final int INNER_RING_RADIUS = 50;
     private static final int OUTER_RING_RADIUS = 80;
 
-    private static final String[] METALS = {
-        "copper", "bronze", "electrum", "gold", "aluminum", "duralumin", "pewter", "tin",
-        "zinc", "brass", "bendalloy", "cadmium", "chromium", "nicrosil", "steel", "iron"
+    private static final Investiture[] ALLOMANCIES = new Investiture[]{
+        Allomancy.STEEL, Allomancy.IRON, Allomancy.PEWTER, Allomancy.TIN,
+        Allomancy.ZINC, Allomancy.BRASS, Allomancy.COPPER, Allomancy.BRONZE,
+        Allomancy.DURALUMIN, Allomancy.ALUMINUM, Allomancy.NICROSIL, Allomancy.CHROMIUM,
+        Allomancy.GOLD, Allomancy.ELECTRUM, Allomancy.CADMIUM, Allomancy.BENDALLOY
     };
 
     private static final ResourceLocation SURROUND = new ResourceLocation(Cosmine.MOD_ID + ":textures/gui/allomancy/surround.png");
     private static final ResourceLocation GAUGE = new ResourceLocation(Cosmine.MOD_ID + ":textures/gui/allomancy/gauge.png");
-    private static ResourceLocation[] SYMBOLS;
-
-    public AllomancyGui() {
-        if (SYMBOLS == null) {
-            SYMBOLS = new ResourceLocation[16];
-            for (int i = 0; i < 16; i++) {
-                SYMBOLS[i] = new ResourceLocation(String.format("%s:textures/gui/allomancy/symbol%s.png", Cosmine.MOD_ID, METALS[i]));
-            }
-        }
-    }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -57,33 +52,66 @@ public class AllomancyGui extends InvestitureGui {
 
         float mouseAngle = mouseAngle(centreX, centreY, mouseX, mouseY);
 
+        ArrayList<SpiritwebAllomancy> allomancies = new ArrayList<SpiritwebAllomancy>();
+        for (Investiture allomancy : ALLOMANCIES) {
+            SpiritwebAllomancy spiritwebAllomancy = (SpiritwebAllomancy)this.spiritweb.getSpiritwebInvestiture(allomancy);
+            if (spiritwebAllomancy != null) {
+                allomancies.add(spiritwebAllomancy);
+            }
+        }
+
+        int powerCount = allomancies.size();
+        int[][] positions = new int[powerCount][];
+        for (int i = 0; i < powerCount; i++) {
+            float azimuth = 0;
+            float radius = 0;
+
+            if (powerCount >= 8) {
+                int innerCount = powerCount / 2;
+                int outerCount = powerCount - innerCount;
+                if (i < innerCount) {
+                    azimuth = i * (360f / innerCount) * MathUtils.DEGTORAD;
+                }
+                else {
+                    azimuth = ((i - innerCount) + 0.5f) * (360f / outerCount) * MathUtils.DEGTORAD;
+                }
+                radius = i < innerCount ? INNER_RING_RADIUS : OUTER_RING_RADIUS;
+            }
+            else {
+                azimuth = i * (360f / powerCount) * MathUtils.DEGTORAD;
+                radius = INNER_RING_RADIUS;
+
+                if (powerCount == 2) { //If two, put them side-by-side
+                    azimuth += Math.PI / 2f;
+                }
+            }
+
+            int pointX = (int)(centreX + Math.sin(azimuth) * radius);
+            int pointY = (int)(centreY - Math.cos(azimuth) * radius);
+            positions[i] = new int[] {pointX, pointY};
+        }
+
         GlStateManager.enableBlend();
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.enableTexture2D();
 
-        for (int i = 0; i < 16; i++) {
-            float azimuth = (((i % 8) * 45f) + (i < 8 ? 0 : 22.5f)) * MathUtils.DEGTORAD;
-            float radius = i < 8 ? INNER_RING_RADIUS : OUTER_RING_RADIUS;
-
-            int pointX = (int)(centreX + Math.sin(azimuth) * radius);
-            int pointY = (int)(centreY - Math.cos(azimuth) * radius);
+        for (int i = 0; i < powerCount; i++) {
+            int pointX = positions[i][0];
+            int pointY = positions[i][1];
 
             drawSurround(pointX, pointY);
-            drawSymbol(pointX, pointY, i);
+            drawSymbol(pointX, pointY, allomancies.get(i).getInvestiture());
 
             float test = i / 16f;
-            drawGauge(pointX, pointY, i, test);
+            drawGauge(pointX, pointY, test);
         }
 
-        for (int i = 0; i < 16; i++) {
-            float azimuth = (((i % 8) * 45f) + (i < 8 ? 0 : 22.5f)) * MathUtils.DEGTORAD;
-            float radius = i < 8 ? INNER_RING_RADIUS : OUTER_RING_RADIUS;
-
-            int pointX = (int)(centreX + Math.sin(azimuth) * radius);
-            int pointY = (int)(centreY - Math.cos(azimuth) * radius);
+        for (int i = 0; i < powerCount; i++) {
+            int pointX = positions[i][0];
+            int pointY = positions[i][1];
 
             if (mouseInArea(pointX, pointY, 144 /*12^2*/, mouseX, mouseY)) {
-                drawLabel(pointX, pointY, i);
+                drawLabel(pointX, pointY, allomancies.get(i).getInvestiture());
             }
         }
 
@@ -106,22 +134,17 @@ public class AllomancyGui extends InvestitureGui {
         drawModalRectWithCustomSizedTexture(x - 20, y - 20, 0, 0, 40, 40, 40, 40);
     }
 
-    private void drawLabel(int x, int y, int index) {
-        String metalName = I18n.format("investiture.allomancy." + METALS[index]);
-        drawCenteredString(fontRenderer, metalName, x, y - 22, 0xFFFFFF);
+    private void drawLabel(int x, int y, Investiture investiture) {
+        drawCenteredString(fontRenderer, investiture.localizedName, x, y - 22, 0xFFFFFF);
     }
 
-    private void drawSymbol(int x, int y, int index) {
-        Investiture investiture = Allomancy.getInvestiture(METALS[index]);
-        boolean hasInvestiture = this.spiritweb.hasInvestitureSource(investiture);
-
-        GlStateManager.color(1, 1, 1, hasInvestiture ? 1.0f : 0.25f);
-        mc.renderEngine.bindTexture(SYMBOLS[index]);
+    private void drawSymbol(int x, int y, Investiture investiture) {
+        GlStateManager.color(1, 1, 1, 1);
+        mc.renderEngine.bindTexture(investiture.symbol);
         drawModalRectWithCustomSizedTexture(x - 8, y - 8, 0, 0, 16, 16, 16, 16);
     }
 
-    private void drawGauge(int x, int y, int index, float fillValue) {
-
+    private void drawGauge(int x, int y, float fillValue) {
         float[] colour = DrawUtils.getGaugeColour(fillValue);
         GlStateManager.color(colour[0], colour[1], colour[2], 1);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);

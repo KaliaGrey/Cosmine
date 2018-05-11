@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "cosmine:items/nuggetlerasium",
+    "layer1": "cosmine:items/nuggetlerasium.chromium"
+  }
+}

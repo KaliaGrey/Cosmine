@@ -38,7 +38,7 @@ public class SpiritwebInvestiturePacket implements IMessage {
 
     public SpiritwebInvestiturePacket(int entityID, SpiritwebInvestiture spiritwebInvestiture) {
         this.entityID = entityID;
-        this.investiture = spiritwebInvestiture.getInvestiture().name;
+        this.investiture = spiritwebInvestiture.getInvestiture().fullName;
         this.nbt = spiritwebInvestiture.serializeNBT();
     }
 

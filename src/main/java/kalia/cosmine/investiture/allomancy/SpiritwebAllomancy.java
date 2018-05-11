@@ -58,7 +58,7 @@ public class SpiritwebAllomancy extends SpiritwebInvestiture {
 
     public void deserializeNBT(NBTTagCompound nbt) {
         super.deserializeNBT(nbt);
-        if (this.investiture.name.equals(nbt.getString("investiture"))) {
+        if (this.investiture.fullName.equals(nbt.getString("investiture"))) {
             this.compounding = nbt.getBoolean("compounding");
         }
     }

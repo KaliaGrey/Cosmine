@@ -55,11 +55,11 @@ public class SpiritwebInvestitureSet implements INBTSerializable<NBTTagList> {
 
         if (spiritwebInvestiture != null) {
             spiritwebInvestiture.deserializeNBT(packet.nbt);
-            Cosmine.log(Level.DEBUG, String.format("Updated %s's %s SpiritwebInvestiture", this.spiritweb.getIdentity(), investiture.name));
+            Cosmine.log(Level.DEBUG, String.format("Updated %s's %s SpiritwebInvestiture", this.spiritweb.getIdentity(), investiture.fullName));
         }
         else {
             this.items.put(investiture, investiture.system.createSpiritwebInvestiture(this.spiritweb, packet.nbt));
-            Cosmine.log(Level.DEBUG, String.format("Created %s's %s SpiritwebInvestiture", this.spiritweb.getIdentity(), investiture.name));
+            Cosmine.log(Level.DEBUG, String.format("Created %s's %s SpiritwebInvestiture", this.spiritweb.getIdentity(), investiture.fullName));
         }
     }
 
@@ -100,7 +100,7 @@ public class SpiritwebInvestitureSet implements INBTSerializable<NBTTagList> {
         for (SpiritwebInvestiture spiritwebInvestiture : this.items.values()) {
             sender.sendMessage(new TextComponentString(String.format(
                     "Investiture: %s (%s) - %s",
-                    spiritwebInvestiture.getInvestiture().name,
+                    spiritwebInvestiture.getInvestiture().fullName,
                     spiritwebInvestiture.getEffectiveIntensity(),
                     spiritwebInvestiture.activationLevel.toString()
             )));

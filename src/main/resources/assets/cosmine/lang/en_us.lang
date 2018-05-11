@@ -20,4 +20,20 @@ commands.inherentinvestiture.usage=inherentinvestiture <add/remove> <system:inve
 
 itemGroup.cosmine=Cosmine
 
-item.cosmine.nuggetlerasium.name=Lerasium Nugget
+item.cosmine.nuggetlerasium.pure.name=Lerasium Nugget
+item.cosmine.nuggetlerasium.aluminum.name=Lerasium-Aluminum Nugget
+item.cosmine.nuggetlerasium.bendalloy.name=Lerasium-Bendalloy Nugget
+item.cosmine.nuggetlerasium.brass.name=Lerasium-Brass Nugget
+item.cosmine.nuggetlerasium.bronze.name=Lerasium-Bronze Nugget
+item.cosmine.nuggetlerasium.cadmium.name=Lerasium-Cadmium Nugget
+item.cosmine.nuggetlerasium.chromium.name=Lerasium-Chromium Nugget
+item.cosmine.nuggetlerasium.copper.name=Lerasium-Copper Nugget
+item.cosmine.nuggetlerasium.duralumin.name=Lerasium-Duralumin Nugget
+item.cosmine.nuggetlerasium.electrum.name=Lerasium-Electrum Nugget
+item.cosmine.nuggetlerasium.gold.name=Lerasium-Gold Nugget
+item.cosmine.nuggetlerasium.iron.name=Lerasium-Iron Nugget
+item.cosmine.nuggetlerasium.nicrosil.name=Lerasium-Nicrosil Nugget
+item.cosmine.nuggetlerasium.pewter.name=Lerasium-Pewter Nugget
+item.cosmine.nuggetlerasium.steel.name=Lerasium-Steel Nugget
+item.cosmine.nuggetlerasium.tin.name=Lerasium-Tin Nugget
+item.cosmine.nuggetlerasium.zinc.name=Lerasium-Zinc Nugget

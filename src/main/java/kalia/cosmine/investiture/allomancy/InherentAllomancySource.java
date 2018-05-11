@@ -40,14 +40,14 @@ public class InherentAllomancySource implements IInvestitureSource, INBTSerializ
     public NBTTagCompound serializeNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
 
-        nbt.setString("investiture", this.investiture.name);
+        nbt.setString("investiture", this.investiture.fullName);
         nbt.setFloat("intensity", this.intensity);
 
         return nbt;
     }
 
     public void deserializeNBT(NBTTagCompound nbt) {
-        if (this.investiture.name.equals(nbt.getString("investiture"))) {
+        if (this.investiture.fullName.equals(nbt.getString("investiture"))) {
             this.intensity = nbt.getFloat("intensity");
         }
     }

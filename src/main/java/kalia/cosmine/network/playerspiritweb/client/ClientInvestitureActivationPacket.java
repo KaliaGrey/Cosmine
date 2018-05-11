@@ -37,7 +37,7 @@ public class ClientInvestitureActivationPacket implements IMessage {
 
     public ClientInvestitureActivationPacket(int entityID, Investiture investiture, ActivationLevel level) {
         this.entityID = entityID;
-        this.investiture = investiture.name;
+        this.investiture = investiture.fullName;
         this.level = level;
     }
 

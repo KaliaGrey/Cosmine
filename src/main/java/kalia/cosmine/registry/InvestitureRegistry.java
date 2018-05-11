@@ -25,7 +25,7 @@ public class InvestitureRegistry {
     }
 
     public static Investiture registerInvestiture(Investiture investiture) {
-        investitures.put(investiture.name, investiture);
+        investitures.put(investiture.fullName, investiture);
         return investiture;
     }
 

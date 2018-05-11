@@ -40,17 +40,17 @@ public class InherentAllomancySet implements INBTSerializable<NBTTagList> {
         if (inherentAllomancy != null) {
             inherentAllomancy.setIntensity(intensity);
             if (inherentAllomancy.getIntensity() > 0) {
-                Cosmine.log(Level.DEBUG, String.format("Updated %s's %s InherentAllomancySource", this.spiritweb.getIdentity(), investiture.name));
+                Cosmine.log(Level.DEBUG, String.format("Updated %s's %s InherentAllomancySource", this.spiritweb.getIdentity(), investiture.fullName));
             }
             else {
                 this.remove(investiture);
-                Cosmine.log(Level.DEBUG, String.format("Removed %s's %s InherentAllomancySource", this.spiritweb.getIdentity(), investiture.name));
+                Cosmine.log(Level.DEBUG, String.format("Removed %s's %s InherentAllomancySource", this.spiritweb.getIdentity(), investiture.fullName));
             }
         }
         else {
             inherentAllomancy = new InherentAllomancySource(investiture, intensity);
             this.set(inherentAllomancy);
-            Cosmine.log(Level.DEBUG, String.format("Created %s's %s InherentAllomancySource", this.spiritweb.getIdentity(), investiture.name));
+            Cosmine.log(Level.DEBUG, String.format("Created %s's %s InherentAllomancySource", this.spiritweb.getIdentity(), investiture.fullName));
         }
 
         return inherentAllomancy;
@@ -105,7 +105,7 @@ public class InherentAllomancySet implements INBTSerializable<NBTTagList> {
         for (InherentAllomancySource inherentAllomancy : this.items.values()) {
             sender.sendMessage(new TextComponentString(String.format(
                 "Inherent Allomancy: %s (%s)",
-                inherentAllomancy.getInvestiture().name,
+                inherentAllomancy.getInvestiture().fullName,
                 inherentAllomancy.getIntensity()
             )));
         }

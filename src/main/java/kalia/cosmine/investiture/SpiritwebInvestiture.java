@@ -53,6 +53,11 @@ public abstract class SpiritwebInvestiture implements INBTSerializable<NBTTagCom
     public abstract boolean canUse();
 
     public void applyInvestitureToEntity(Entity entity) {
+        //Todo: Test code, remove this
+        if (this.investiture.effects == null) {
+            return;
+        }
+
         if (this.getEffectiveIntensity() > 0) {
             if (this.activationLevel != ActivationLevel.NONE) {
                 this.investiture.effects.applyEffectsToEntity(entity, this, this.lastTickActivationLevel);
@@ -78,7 +83,7 @@ public abstract class SpiritwebInvestiture implements INBTSerializable<NBTTagCom
     public NBTTagCompound serializeNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
 
-        nbt.setString("investiture", this.investiture.name);
+        nbt.setString("investiture", this.investiture.fullName);
         nbt.setLong("totalActivationTicks", this.totalActivationTicks);
         nbt.setInteger("activationLevel", ActivationLevel.toIndex(this.activationLevel));
 
@@ -86,7 +91,7 @@ public abstract class SpiritwebInvestiture implements INBTSerializable<NBTTagCom
     }
 
     public void deserializeNBT(NBTTagCompound nbt) {
-        if (this.investiture.name.equals(nbt.getString("investiture"))) {
+        if (this.investiture.fullName.equals(nbt.getString("investiture"))) {
             this.totalActivationTicks = nbt.getLong("totalActivationTicks");
             this.activationLevel = ActivationLevel.fromIndex(nbt.getInteger("activationLevel"));
         }

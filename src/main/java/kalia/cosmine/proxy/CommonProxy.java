@@ -31,16 +31,16 @@ public class CommonProxy {
         config = new Configuration(new File(directory.getPath(), "cosmine.cfg"));
         Config.read();
 
+        InvestitureRegistry.register();
+
         NetworkHandler.registerChannel(Cosmine.MOD_ID);
         NetworkHandler.registerMessages();
     }
 
     public void init(FMLInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(this); //Todo: Check if we need this
 
         CapabilityRegistry.register(CapabilityManager.INSTANCE);
-
-        InvestitureRegistry.register();
     }
 
     public void postInit(FMLPostInitializationEvent event) {
